@@ -18,7 +18,7 @@ public class SocketWorker extends Thread {
 			InputStream in = socket.getInputStream();
 			byte[] bytes = new byte[1024];
 			while (true) {
-				int length = in.read(bytes);
+				int length = in.read(bytes);// 阻塞读取
 				if (length != -1) {
 					String content = new String(bytes, 0, length);
 					System.out.println(this.getId() + "," + this.getName() + ", Content:" + content);

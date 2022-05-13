@@ -22,11 +22,11 @@ public class SocketMain {
 			ExecutorService threadPool = Executors.newCachedThreadPool();
 
 			while (true) {
-				Socket socket = server.accept();
+				Socket socket = server.accept();// 阻塞等待客户端连接
 				logger.info("连接到客户端，启动线程去处理");
 				threadPool.execute(new SocketWorker(socket));
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
