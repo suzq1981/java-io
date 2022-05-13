@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true" scan="true" scanPeriod="1 seconds">
-
-    <contextName>logback</contextName>
-    <property name="scheduler.manager.server.home" value="D:" />
-    <!--定义参数,后面可以通过${app.name}使用-->
-    <property name="app.name" value="netty-core"/>
-    <!--ConsoleAppender 用于在屏幕上输出日志-->
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+<configuration>
+	<!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】,,, -->
+	<!-- appender是configuration的子节点，是负责写日志的组件。 -->
+	<!-- ConsoleAppender：把日志输出到控制台 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!--定义了一个过滤器,在LEVEL之下的日志输出不会被打印出来-->
         <!--这里定义了DEBUG，也就是控制台不会输出比ERROR级别小的日志-->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -19,36 +16,40 @@
         </encoder>
     </appender>
 
-    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!--定义日志输出的路径-->
-        <!--这里的scheduler.manager.server.home 没有在上面的配置中设定，所以会使用java启动时配置的值-->
-        <!--比如通过 java -Dscheduler.manager.server.home=/path/to XXXX 配置该属性-->
-        <file>${scheduler.manager.server.home}/logs/${app.name}.log</file>
-        <!--定义日志滚动的策略-->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--定义文件滚动时的文件名的格式-->
-            <fileNamePattern>${scheduler.manager.server.home}/logs/${app.name}.%d{yyyy-MM-dd.HH}.log.gz
-            </fileNamePattern>
-            <!--60天的时间周期，日志量最大20GB-->
-            <maxHistory>60</maxHistory>
-            <!-- 该属性在 1.1.6版本后 才开始支持-->
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <!--每个日志文件最大100MB-->
-            <maxFileSize>100MB</maxFileSize>
-        </triggeringPolicy>
-        <!--定义输出格式-->
-        <encoder>
-            <pattern>%d [%thread] %-5level %logger{36} [%file : %line] - %msg%n</pattern>
-        </encoder>
-    </appender>
+	<!-- RollingFileAppender：滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+	<appender name="SYSLOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- <File>logs/log.log</File> -->
+		<!-- rollingPolicy:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。 -->
+		<!-- TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
+			<!-- 文件名：log/sys.2017-12-05.0.log -->
+			<fileNamePattern>D:/logs/netty-core-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>60MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<!-- pattern节点，用来设置日志的输入格式 -->
+			<pattern>%d [%thread] %-5level %logger{36} [%file : %line] - %msg%n</pattern>
+			<!-- 记录日志的编码 -->
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	     
+	<appender name="ASYNC_ROLLING_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>512</queueSize>    <!-- 队列长度，默认256 -->
+		<includeCallerData>true</includeCallerData>
+		<appender-ref ref="SYSLOG" />
+	</appender>
 
-    <!--root是默认的logger 这里设定输出级别是debug-->
-    <root level="trace">
-        <!--定义了两个appender，日志会通过往这两个appender里面写-->
-        <appender-ref ref="stdout"/>
-        <appender-ref ref="file"/>
-    </root>
+	<!-- 控制台输出日志级别 -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ASYNC_ROLLING_FILE" />
+	</root>
 
 </configuration>
