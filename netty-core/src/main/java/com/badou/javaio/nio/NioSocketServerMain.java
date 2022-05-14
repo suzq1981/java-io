@@ -8,6 +8,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class NioSocketServerMain {
 
@@ -39,17 +40,18 @@ public class NioSocketServerMain {
 
     }
 
-    public static void doRead(SelectionKey key) {
+    public static void doRead(SelectionKey key) throws Exception {
+        TimeUnit.MILLISECONDS.sleep(300);
         SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(1024);
-        int length = 0;
+        int length = -1;
         try {
-            while ((length = channel.read(buffer)) != 0) {
+            while ((length = channel.read(buffer)) > 0) {
                 buffer.flip();
-                System.out.println(channel.hashCode() + " " + new String(buffer.array(), 0, length));
+                System.out.println(new String(buffer.array(), 0, length));
                 buffer.clear();
             }
-            byte[] content = ("Server Mo").getBytes();
+            byte[] content = (channel.hashCode() + " Server Mo").getBytes();
             buffer.put(content);
             buffer.flip();
             channel.write(buffer);
