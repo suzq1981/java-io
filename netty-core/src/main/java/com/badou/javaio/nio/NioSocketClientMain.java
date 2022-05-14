@@ -6,6 +6,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class NioSocketClientMain {
 
@@ -40,8 +41,9 @@ public class NioSocketClientMain {
         }
 
         buffer.clear();
-        buffer.put("I am Godson 002".getBytes());
+        buffer.put("I am Godson 003".getBytes());
         buffer.flip();
         channel.write(buffer);
+        TimeUnit.SECONDS.sleep(1);
     }
 }
