@@ -14,7 +14,7 @@ public class SocketClient {
 
 	public static void main(String[] args) throws Exception {
 
-		Socket socket = new Socket("127.0.0.1", 9980);
+		Socket socket = new Socket("127.0.0.1", 9000);
 
 		try {
 			InputStream in = socket.getInputStream();
