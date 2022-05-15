@@ -16,7 +16,7 @@ public class NioSocketClientMain {
         channel.configureBlocking(false);
 
         Selector selector = Selector.open();
-        channel.register(selector, SelectionKey.OP_READ);
+        channel.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(1024));
 
         while (true) {
             selector.select();
@@ -32,7 +32,7 @@ public class NioSocketClientMain {
 
     public static void doRead(SelectionKey selectionKey) throws Exception {
         SocketChannel channel = (SocketChannel) selectionKey.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = (ByteBuffer) selectionKey.attachment();
 
         int length = -1;
         while ((length = channel.read(buffer)) > 0) {
@@ -41,9 +41,10 @@ public class NioSocketClientMain {
         }
 
         buffer.clear();
-        buffer.put("I am Godson 003".getBytes());
+        buffer.put("I am Godson 001".getBytes());
         buffer.flip();
         channel.write(buffer);
+        buffer.clear();
         TimeUnit.SECONDS.sleep(1);
     }
 }

@@ -1,6 +1,5 @@
 package com.badou.javaio.nio;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -12,6 +11,7 @@ import java.util.Iterator;
 public class NioSocketServerMain {
 
     public static void main(String[] args) throws Exception {
+
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.socket().bind(new InetSocketAddress(9000), 150);
@@ -20,51 +20,36 @@ public class NioSocketServerMain {
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
         while (true) {
-            selector.select();
-            Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
-            while (iterator.hasNext()) {
-                SelectionKey selectionKey = iterator.next();
-                if (selectionKey.isValid()) {
+            if (selector.select() > 0) {
+                Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                while (iterator.hasNext()) {
+                    SelectionKey selectionKey = iterator.next();
                     if (selectionKey.isAcceptable()) {
                         doAccept(selectionKey);
                     }
                     if (selectionKey.isReadable()) {
                         doRead(selectionKey);
                     }
-                } else {
                     iterator.remove();
                 }
             }
         }
-
     }
 
     public static void doRead(SelectionKey key) throws Exception {
         SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = (ByteBuffer) key.attachment();
         int length = -1;
-        boolean flag = false;
-        try {
-            while ((length = channel.read(buffer)) > 0) {
-                buffer.flip();
-                System.out.println(new String(buffer.array(), 0, length));
-                buffer.clear();
-                flag = true;
-            }
-            if (flag) {
-                byte[] content = (channel.hashCode() + " Server Mo").getBytes();
-                buffer.put(content);
-                buffer.flip();
-                channel.write(buffer);
-                flag = false;
-            }
-        } catch (Exception ex) {
-            try {
-                channel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        while ((length = channel.read(buffer)) > 0) {
+            buffer.flip();
+            System.out.println(new String(buffer.array(), 0, length));
+            buffer.clear();
         }
+        byte[] content = (channel.hashCode() + " Server Mo").getBytes();
+        buffer.put(content);
+        buffer.flip();
+        channel.write(buffer);
+        buffer.clear();
     }
 
     public static void doAccept(SelectionKey key) throws Exception {
@@ -75,10 +60,9 @@ public class NioSocketServerMain {
             socketChannel.configureBlocking(false);
             socketChannel.socket().setKeepAlive(true);
             socketChannel.socket().setTcpNoDelay(true);
-            socketChannel.register(key.selector(), SelectionKey.OP_READ);
+            socketChannel.register(key.selector(), SelectionKey.OP_READ, ByteBuffer.allocate(1024));
 
-            ByteBuffer buffer = ByteBuffer.allocate(100);
-            buffer.put("Welcom to the Heaven.".getBytes());
+            ByteBuffer buffer = ByteBuffer.wrap("Welcome to the Heaven.".getBytes());
             buffer.flip();
             socketChannel.write(buffer);
         }
