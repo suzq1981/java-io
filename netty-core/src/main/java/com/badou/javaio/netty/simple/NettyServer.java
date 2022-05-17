@@ -8,6 +8,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpServerCodec;
 
 public class NettyServer {
 
@@ -22,7 +23,6 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)//心跳监测
-                    .childOption(ChannelOption.SO_TIMEOUT,5000)
                     .childHandler(new NettyServerChannelInitializer());
 
             //启动server,并且设置7000为启动的端口号,同时启动方同步获取结果

@@ -4,9 +4,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
+
+//    @Override
+//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+//        if (evt instanceof IdleStateEvent) {
+//            IdleStateEvent event = (IdleStateEvent) evt;
+//            if (event.state() == IdleState.READER_IDLE) {
+//                ctx.writeAndFlush(Unpooled.copiedBuffer("心跳", CharsetUtil.UTF_8));
+//            }
+//        }
+//        super.userEventTriggered(ctx, evt);
+//    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
