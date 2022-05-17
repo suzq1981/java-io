@@ -2,9 +2,6 @@ package com.badou.javaio.netty.simple;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
-
-import java.util.concurrent.TimeUnit;
 
 public class NettyClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
