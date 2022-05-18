@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+</head>
+<body>
+    <form onsubmit="return false">
+        <textarea id="message" name="message" style="width:300px;height: 300px;"></textarea>
+        <input type="button" value="发送消息" onclick="send(this.form.message.value)">
+        <textarea id="txtResponse" style="width: 300px;height: 300px;"></textarea>
+        <input type="button" value="清空内容" onclick="document.getElementById('txtResponse').value=''"/>
+    </form>
+    <script type="text/javascript">
+
+        var wsocket;
+        if(window.WebSocket){
+            wsocket = new WebSocket("ws://localhost:1000/talk")
+
+            wsocket.onmessage = function(response){
+                var element = document.getElementById("txtResponse");
+                element.value = element.value + "\n" + response.data;
+            }
+
+            wsocket.onopen = function (evt){
+                var element = document.getElementById("txtResponse");
+                element.value = "连接已建立.";
+            }
+
+            wsocket.onclose = function(evt){
+                var element = document.getElementById("txtResponse");
+                element.value = element.value + "\n连接关闭." ;
+            }
+        }else{
+            alert("当前浏览器不支持WebSocket.");
+        }
+
+        function send(message){
+            if(!window.wsocket){
+                return ;
+            }
+            if(wsocket.readyState == WebSocket.OPEN){
+                wsocket.send(message);
+            }else{
+                alert("连接没有开启.");
+            }
+        }
+    </script>
+</body>
+</html>
