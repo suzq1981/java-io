@@ -16,17 +16,17 @@
         var wsocket;
         if(window.WebSocket){
             wsocket = new WebSocket("ws://localhost:1000/talk")
-
+            //消息返回
             wsocket.onmessage = function(response){
                 var element = document.getElementById("txtResponse");
                 element.value = element.value + "\n" + response.data;
             }
-
+            //建立连接
             wsocket.onopen = function (evt){
                 var element = document.getElementById("txtResponse");
                 element.value = "连接已建立.";
             }
-
+            //关闭连接
             wsocket.onclose = function(evt){
                 var element = document.getElementById("txtResponse");
                 element.value = element.value + "\n连接关闭." ;
