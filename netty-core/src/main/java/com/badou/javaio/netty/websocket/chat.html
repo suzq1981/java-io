@@ -16,7 +16,7 @@
         var wsocket;
         if(window.WebSocket){
             wsocket = new WebSocket("ws://localhost:1000/talk")
-            //消息返回
+            //服务端返回消息，将消息添加到文本域中
             wsocket.onmessage = function(response){
                 var element = document.getElementById("txtResponse");
                 element.value = element.value + "\n" + response.data;
